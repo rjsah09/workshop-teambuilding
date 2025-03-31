@@ -109,7 +109,20 @@ const equalizeTeams = (group) => {
 };
 
 const saveAsTxt = () => {
-    console.log("텍스트 저장 기능 미구현");
+    let content = "";
+
+    teams.value.forEach((team, index) => {
+        content += `[Team${index + 1}]\n`;
+        content += team.join(", ") + "\n\n";
+    });
+
+    const blob = new Blob([content], { type: "text/plain" });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "팀빌딩결과.txt";
+
+    link.click();
 };
 </script>
 
