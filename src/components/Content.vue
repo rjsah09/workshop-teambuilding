@@ -24,8 +24,6 @@ const makeTeam = async () => {
     pickTeamMember(last, false); //4. 나머지 인원을 역방향으로 채우기
 
     console.log("teams:", teams);
-
-    // printResult();
 };
 
 //텍스트 파일 read 함수
@@ -59,11 +57,6 @@ const getGroup = (text) => {
     yb = ybMatch ? ybMatch[1].trim().split(/\s+/) : [];
     g = gMatch ? gMatch[1].trim().split(/\s+/) : [];
     team_count = teamCountMatch ? parseInt(teamCountMatch[1]) : null;
-
-    // console.log("OB:", ob);
-    // console.log("YB:", yb);
-    // console.log("G:", g);
-    // console.log("Team_count:", team_count);
 
     teams.value = Array.from({ length: team_count }, () => []);
 };
@@ -115,30 +108,6 @@ const equalizeTeams = (group) => {
     }
 };
 
-// const printResult = () => {
-//     const resultContainer = document.getElementById("result-container");
-//     resultContainer.innerHTML = "";
-
-//     teams.forEach((team, index) => {
-//         const teamDiv = document.createElement("div");
-//         teamDiv.classList.add("team");
-
-//         const teamTitle = document.createElement("h4");
-//         teamTitle.innerText = `Team ${index + 1}`;
-//         teamDiv.appendChild(teamTitle);
-
-//         const teamMembers = document.createElement("ul");
-//         team.forEach((member) => {
-//             const memberItem = document.createElement("li");
-//             memberItem.innerText = member;
-//             teamMembers.appendChild(memberItem);
-//         });
-
-//         teamDiv.appendChild(teamMembers);
-//         resultContainer.appendChild(teamDiv);
-//     });
-// };
-
 const saveAsTxt = () => {
     console.log("텍스트 저장 기능 미구현");
 };
@@ -152,27 +121,25 @@ const saveAsTxt = () => {
             <h3>2025-04-11 ~ 2025-04-12</h3>
         </div>
         <div>
-            <div class="content" v-if="!activated">
-                <button class="btn" v-on:click="makeTeam">팀 생성</button>
+            <div class="content">
+                <button class="btn" v-on:click="makeTeam">생성</button>
             </div>
-            <div class="content" v-else>
+            <div class="content" v-if="activated">
                 <div>
-                    <h3>팀 빌딩 결과</h3>
-                    <button class="btn" v-on:click="makeTeam">다시 생성</button>
                     <div id="result-container">
                         <div
                             v-for="(team, index) in teams"
                             :key="index"
                             class="team"
                         >
-                            <h4>Team {{ index + 1 }}</h4>
-                            <ul>
-                                <li v-for="(member, i) in team" :key="i">
-                                    {{ member }}
-                                </li>
-                            </ul>
+                            <h3>Team {{ index + 1 }}</h3>
+                            <p v-for="(member, i) in team" :key="i">
+                                {{ member }}
+                            </p>
                         </div>
                     </div>
+                </div>
+                <div id="save">
                     <button class="btn" v-on:click="saveAsTxt">
                         결과 저장
                     </button>
@@ -203,6 +170,7 @@ h3 {
 
 .content {
     margin-top: 1em;
+    margin-bottom: 1em;
     padding-bottom: 1em;
 }
 
@@ -251,6 +219,7 @@ h3 {
 }
 
 #result-container {
+    margin-top: 1em;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -258,12 +227,19 @@ h3 {
 }
 
 .team {
-    width: calc(25% - 10px);
+    width: 22%;
     min-width: 150px;
     background-color: white;
     padding: 10px;
     border-radius: 10px;
-    text-align: center;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#save {
+    margin-top: 1em;
+}
+
+li {
+    list-style-type: none;
 }
 </style>
