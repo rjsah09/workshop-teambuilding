@@ -66,7 +66,7 @@ const getGroup = (text) => {
     obOrigin = [...ob];
     ybOrigin = [...yb];
     gOrigin = [...g];
-    
+
 
     team_count = teamCountMatch ? parseInt(teamCountMatch[1]) : null;
 
@@ -202,6 +202,7 @@ const saveAsTxt = () => {
 
 <style scoped>
 #wrapper {
+    
     width: 100%;
     padding-top: 1em;
     padding-bottom: 1em;
