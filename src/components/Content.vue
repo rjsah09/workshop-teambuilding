@@ -1,12 +1,17 @@
 <script setup>
 import { ref } from "vue";
 
+const animationKey = ref(0);
 const activated = ref(false);
 let ob = null;
 let yb = null;
 let g = null;
 let team_count = null;
 let teams = ref([]);
+
+let obOrigin = [];
+let ybOrigin = [];
+let gOrigin = [];
 
 //팀 빌딩 함수
 const makeTeam = async () => {
@@ -22,7 +27,8 @@ const makeTeam = async () => {
     pickTeamMember(g); //2. 여성 채우기
     equalizeTeams(last); //3. 가장 인원 많은 팀의 인원 수와 같아질 때 까지 yb, ob 중 인원 적은 그룹에서 역방향으로 채우기
     pickTeamMember(last, false); //4. 나머지 인원을 역방향으로 채우기
-
+    sortTeamMembers();
+    animationKey.value++;
     console.log("teams:", teams);
 };
 
@@ -56,6 +62,11 @@ const getGroup = (text) => {
     ob = obMatch ? obMatch[1].trim().split(/\s+/) : [];
     yb = ybMatch ? ybMatch[1].trim().split(/\s+/) : [];
     g = gMatch ? gMatch[1].trim().split(/\s+/) : [];
+
+    obOrigin = [...ob];
+    ybOrigin = [...yb];
+    gOrigin = [...g];
+
     team_count = teamCountMatch ? parseInt(teamCountMatch[1]) : null;
 
     teams.value = Array.from({ length: team_count }, () => []);
@@ -77,6 +88,16 @@ const pickTeamMember = (group, forward) => {
 
         count++;
     }
+};
+
+//인원 정렬
+const sortTeamMembers = () => {
+    teams.value = teams.value.map((team) => {
+        const obMembers = team.filter((m) => obOrigin.includes(m));
+        const ybMembers = team.filter((m) => ybOrigin.includes(m));
+        const gMembers = team.filter((m) => gOrigin.includes(m));
+        return [...obMembers, ...ybMembers, ...gMembers];
+    });
 };
 
 //난수 뽑기
@@ -139,11 +160,12 @@ const saveAsTxt = () => {
             </div>
             <div class="content" v-if="activated">
                 <div>
-                    <div id="result-container">
+                    <div id="result-container" :key="animationKey">
                         <div
                             v-for="(team, index) in teams"
                             :key="index"
                             class="team"
+                            :style="{ animationDelay: `${index * 0.1}s` }"
                         >
                             <h3>Team {{ index + 1 }}</h3>
                             <p v-for="(member, i) in team" :key="i">
@@ -246,6 +268,8 @@ h3 {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
 }
 
 #save {
@@ -255,4 +279,16 @@ h3 {
 li {
     list-style-type: none;
 }
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 </style>
