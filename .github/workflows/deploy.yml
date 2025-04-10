@@ -22,6 +22,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_BASE: /workshop-teambuilding/  # 👉 이 환경변수를 아래에서 받아야 함
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
