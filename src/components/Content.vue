@@ -66,6 +66,7 @@ const getGroup = (text) => {
     obOrigin = [...ob];
     ybOrigin = [...yb];
     gOrigin = [...g];
+    
 
     team_count = teamCountMatch ? parseInt(teamCountMatch[1]) : null;
 
