@@ -73,29 +73,39 @@ const getGroup = (text) => {
 };
 
 //그룹에서 사람을 뽑아 팀에 넣는 함수
-const pickTeamMember = (group, forward) => {
+const pickTeamMember = (group, forward = true) => {
     let count = 0;
+    let groupName = getGroupName(group);
+
     while (group.length > 0) {
-        // 팀을 채울 순서를 결정 - forward가 true는 0부터, false는 마지막 팀부터
         const teamIndex = forward
             ? count % team_count
             : team_count - 1 - (count % team_count);
 
         const groupMemberIndex = getRandomInt(0, group.length);
+        const memberName = group[groupMemberIndex];
 
-        teams.value[teamIndex].push(group[groupMemberIndex]);
+        teams.value[teamIndex].push({ name: memberName, group: groupName });
         group.splice(groupMemberIndex, 1);
 
         count++;
     }
 };
 
+//인원의 그룹(OB, YB, G) 반환하는 함수
+const getGroupName = (group) => {
+    if (group === ob) return "OB";
+    if (group === yb) return "YB";
+    if (group === g) return "G";
+    return "";
+};
+
 //인원 정렬
 const sortTeamMembers = () => {
     teams.value = teams.value.map((team) => {
-        const obMembers = team.filter((m) => obOrigin.includes(m));
-        const ybMembers = team.filter((m) => ybOrigin.includes(m));
-        const gMembers = team.filter((m) => gOrigin.includes(m));
+        const obMembers = team.filter((m) => m.group === "OB");
+        const ybMembers = team.filter((m) => m.group === "YB");
+        const gMembers = team.filter((m) => m.group === "G");
         return [...obMembers, ...ybMembers, ...gMembers];
     });
 };
@@ -168,8 +178,13 @@ const saveAsTxt = () => {
                             :style="{ animationDelay: `${index * 0.1}s` }"
                         >
                             <h3>Team {{ index + 1 }}</h3>
-                            <p v-for="(member, i) in team" :key="i">
-                                {{ member }}
+                            <p
+                                v-for="(member, i) in team"
+                                :key="i"
+                                :class="member.group.toLowerCase()"
+                                class="member_name"
+                            >
+                                {{ member.name }}
                             </p>
                         </div>
                     </div>
@@ -289,6 +304,23 @@ li {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.member_name {
+    font-size: 1.5em;
+}
+
+.ob {
+    color: #003399;
+    font-weight: bold;
+}
+.yb {
+    color: #2b7a2b;
+    font-weight: bold;
+}
+.g {
+    color: #d63384;
+    font-weight: bold;
 }
 
 </style>
