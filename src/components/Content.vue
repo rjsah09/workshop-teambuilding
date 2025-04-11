@@ -1,17 +1,12 @@
 <script setup>
 import { ref } from "vue";
 
-const animationKey = ref(0);
 const activated = ref(false);
 let ob = null;
 let yb = null;
 let g = null;
 let team_count = null;
 let teams = ref([]);
-
-let obOrigin = [];
-let ybOrigin = [];
-let gOrigin = [];
 
 //팀 빌딩 함수
 const makeTeam = async () => {
@@ -27,8 +22,7 @@ const makeTeam = async () => {
     pickTeamMember(g); //2. 여성 채우기
     equalizeTeams(last); //3. 가장 인원 많은 팀의 인원 수와 같아질 때 까지 yb, ob 중 인원 적은 그룹에서 역방향으로 채우기
     pickTeamMember(last, false); //4. 나머지 인원을 역방향으로 채우기
-    sortTeamMembers();
-    animationKey.value++;
+
     console.log("teams:", teams);
 };
 
@@ -62,58 +56,32 @@ const getGroup = (text) => {
     ob = obMatch ? obMatch[1].trim().split(/\s+/) : [];
     yb = ybMatch ? ybMatch[1].trim().split(/\s+/) : [];
     g = gMatch ? gMatch[1].trim().split(/\s+/) : [];
-
-    obOrigin = [...ob];
-    ybOrigin = [...yb];
-    gOrigin = [...g];
-
-
     team_count = teamCountMatch ? parseInt(teamCountMatch[1]) : null;
 
     teams.value = Array.from({ length: team_count }, () => []);
 };
 
 //그룹에서 사람을 뽑아 팀에 넣는 함수
-const pickTeamMember = (group, forward = true) => {
+const pickTeamMember = (group, forward) => {
     let count = 0;
-    let groupName = getGroupName(group);
-
     while (group.length > 0) {
+        // 팀을 채울 순서를 결정 - forward가 true는 0부터, false는 마지막 팀부터
         const teamIndex = forward
             ? count % team_count
             : team_count - 1 - (count % team_count);
 
         const groupMemberIndex = getRandomInt(0, group.length);
-        const memberName = group[groupMemberIndex];
 
-        teams.value[teamIndex].push({ name: memberName, group: groupName });
+        teams.value[teamIndex].push(group[groupMemberIndex]);
         group.splice(groupMemberIndex, 1);
 
         count++;
     }
 };
 
-//인원의 그룹(OB, YB, G) 반환하는 함수
-const getGroupName = (group) => {
-    if (group === ob) return "OB";
-    if (group === yb) return "YB";
-    if (group === g) return "G";
-    return "";
-};
-
-//인원 정렬
-const sortTeamMembers = () => {
-    teams.value = teams.value.map((team) => {
-        const obMembers = team.filter((m) => m.group === "OB");
-        const ybMembers = team.filter((m) => m.group === "YB");
-        const gMembers = team.filter((m) => m.group === "G");
-        return [...obMembers, ...ybMembers, ...gMembers];
-    });
-};
-
 //난수 뽑기
 const getRandomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min) + min);
+    return Math.floor(Math.random() * (max - min)) + min;
 };
 
 //마지막 그룹 뽑기 전 인원 균등하게 처리
@@ -145,7 +113,7 @@ const saveAsTxt = () => {
 
     teams.value.forEach((team, index) => {
         content += `[Team${index + 1}]\n`;
-        content += team.map(member => member.name).join(", ") + "\n\n";
+        content += team.join(", ") + "\n\n";
     });
 
     const blob = new Blob([content], { type: "text/plain" });
@@ -171,21 +139,15 @@ const saveAsTxt = () => {
             </div>
             <div class="content" v-if="activated">
                 <div>
-                    <div id="result-container" :key="animationKey">
+                    <div id="result-container">
                         <div
                             v-for="(team, index) in teams"
                             :key="index"
                             class="team"
-                            :style="{ animationDelay: `${index * 0.1}s` }"
                         >
                             <h3>Team {{ index + 1 }}</h3>
-                            <p
-                                v-for="(member, i) in team"
-                                :key="i"
-                                :class="member.group.toLowerCase()"
-                                class="member_name"
-                            >
-                                {{ member.name }}
+                            <p v-for="(member, i) in team" :key="i">
+                                {{ member }}
                             </p>
                         </div>
                     </div>
@@ -202,7 +164,6 @@ const saveAsTxt = () => {
 
 <style scoped>
 #wrapper {
-    
     width: 100%;
     padding-top: 1em;
     padding-bottom: 1em;
@@ -285,8 +246,6 @@ h3 {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
 }
 
 #save {
@@ -296,33 +255,4 @@ h3 {
 li {
     list-style-type: none;
 }
-
-@keyframes fadeInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(100%);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.member_name {
-    font-size: 1.5em;
-}
-
-.ob {
-    color: #003399;
-    font-weight: bold;
-}
-.yb {
-    color: #003399;
-    font-weight: bold;
-}
-.g {
-    color: #d63384;
-    font-weight: bold;
-}
-
 </style>
