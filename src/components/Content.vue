@@ -145,7 +145,7 @@ const saveAsTxt = () => {
 
     teams.value.forEach((team, index) => {
         content += `[Team${index + 1}]\n`;
-        content += team.join(", ") + "\n\n";
+        content += team.map(member => member.name).join(", ") + "\n\n";
     });
 
     const blob = new Blob([content], { type: "text/plain" });
@@ -317,7 +317,7 @@ li {
     font-weight: bold;
 }
 .yb {
-    color: #2b7a2b;
+    color: #003399;
     font-weight: bold;
 }
 .g {
